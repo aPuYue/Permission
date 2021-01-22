@@ -27,13 +27,23 @@ import Photos
 
 extension Permission {
     var statusPhotos: PermissionStatus {
-        let status = PHPhotoLibrary.authorizationStatus()
-
-        switch status {
-        case .authorized:          return .authorized
-        case .denied, .restricted: return .denied
-        case .notDetermined:       return .notDetermined
-        @unknown default:          return .notDetermined
+        if #available(iOS 14, *) {
+            let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+            switch status {
+            case .limited:             return .denied
+            case .authorized:          return .authorized
+            case .denied, .restricted: return .denied
+            case .notDetermined:       return .notDetermined
+            @unknown default:          return .notDetermined
+            }
+        } else {
+            let status = PHPhotoLibrary.authorizationStatus()
+            switch status {
+            case .authorized:          return .authorized
+            case .denied, .restricted: return .denied
+            case .notDetermined:       return .notDetermined
+            @unknown default:          return .notDetermined
+            }
         }
     }
 
